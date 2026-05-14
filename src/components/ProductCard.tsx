@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { Product } from '@/types';
-import { Star, Plus, ShoppingCart } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Star, Plus, Minus, ShoppingCart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import QuantityModal from './QuantityModal';
 
@@ -13,7 +13,9 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { addToBuyNow } = useCart();
+  const { buyNowList, addToBuyNow, updateBuyNowQuantity } = useCart();
+
+  const itemInBuyNow = buyNowList.find(item => item.id === product.id);
 
   const formattedPrice = new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -61,9 +63,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
 
-          <div className="mt-auto space-y-2">
+          <div className="mt-auto space-y-3">
             <div className="flex items-baseline gap-1">
-               <p className="text-xs sm:text-lg font-black text-red-600 tracking-tighter">{formattedPrice}</p>
+               <p className="text-sm sm:text-lg font-black text-red-600 tracking-tighter">{formattedPrice}</p>
                {product.isPromo && (
                  <p className="text-[8px] sm:text-[10px] text-gray-400 line-through font-bold">
                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
@@ -71,24 +73,57 @@ export default function ProductCard({ product }: ProductCardProps) {
                )}
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+               {/* Keranjang Icon - Tetap untuk buka modal detail */}
                <button
                  onClick={() => setIsModalOpen(true)}
-                 className="flex-1 bg-gray-50 text-gray-900 py-2 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center"
-                 title="Tambah ke Keranjang"
+                 className="p-2 sm:p-2.5 bg-gray-50 text-gray-900 rounded-xl hover:bg-gray-100 transition-all active:scale-95 border border-gray-100"
                >
-                 <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
+                 <ShoppingCart size={16} />
                </button>
-               <button
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   addToBuyNow(product, 1);
-                 }}
-                 className="flex-1 bg-red-600 text-white py-2 rounded-lg sm:rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200 active:scale-95 flex items-center justify-center"
-                 title="Beli Sekarang"
-               >
-                 <Plus size={14} className="sm:w-4 sm:h-4" />
-               </button>
+
+               {/* Dynamic Button: Plus vs Quantity Controller */}
+               <div className="flex-1">
+                 <AnimatePresence mode="wait">
+                   {itemInBuyNow ? (
+                     <motion.div 
+                       key="qty-control"
+                       initial={{ opacity: 0, scale: 0.9 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.9 }}
+                       className="flex items-center justify-between bg-red-600 text-white rounded-xl p-1 shadow-lg shadow-red-200"
+                     >
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); updateBuyNowQuantity(product.id, itemInBuyNow.quantity - 1); }}
+                          className="p-1 sm:p-1.5 hover:bg-white/20 rounded-lg transition-all"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="text-xs sm:text-sm font-black">{itemInBuyNow.quantity}</span>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); addToBuyNow(product, 1); }}
+                          className="p-1 sm:p-1.5 hover:bg-white/20 rounded-lg transition-all"
+                        >
+                          <Plus size={14} />
+                        </button>
+                     </motion.div>
+                   ) : (
+                     <motion.button
+                       key="add-btn"
+                       initial={{ opacity: 0, scale: 0.9 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.9 }}
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         addToBuyNow(product, 1);
+                       }}
+                       className="w-full bg-red-600 text-white py-2.5 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-200 active:scale-95 flex items-center justify-center gap-2"
+                     >
+                       <Plus size={14} /> Tambah
+                     </motion.button>
+                   )}
+                 </AnimatePresence>
+               </div>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ interface CartContextType {
   // Wadah Beli Sekarang (Floating Bar)
   buyNowList: CartItem[];
   addToBuyNow: (product: Product, quantity: number) => void;
+  updateBuyNowQuantity: (productId: string, quantity: number) => void;
   removeFromBuyNow: (productId: string) => void;
   clearBuyNow: () => void;
   buyNowTotalItems: number;
@@ -87,6 +88,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const updateBuyNowQuantity = (productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      setBuyNowList((prev) => prev.filter((item) => item.id !== productId));
+      return;
+    }
+    setBuyNowList((prev) =>
+      prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
+    );
+  };
+
   const removeFromBuyNow = (productId: string) => {
     setBuyNowList((prev) => prev.filter((item) => item.id !== productId));
   };
@@ -117,6 +128,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         totalPrice,
         buyNowList,
         addToBuyNow,
+        updateBuyNowQuantity,
         removeFromBuyNow,
         clearBuyNow,
         buyNowTotalItems,
