@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { products } from '@/data/products';
 import { Category } from '@/types';
 import ProductCard, { ProductSkeleton } from '@/components/ProductCard';
@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
@@ -89,7 +89,7 @@ export default function Home() {
         />
       </section>
 
-      {/* Promo Section - WITHOUT BACKGROUND WRAPPER */}
+      {/* Promo Section */}
       {!searchQuery && selectedCategory === 'All' && (
         <section className="mb-16 sm:mb-20">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -165,5 +165,13 @@ export default function Home() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-10 text-center font-black">Memuat Beranda...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

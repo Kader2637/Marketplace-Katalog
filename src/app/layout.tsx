@@ -4,6 +4,7 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import FloatingCartBar from "@/components/FloatingCartBar";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col bg-gray-50 text-gray-900`}>
         <CartProvider>
-          <Navbar />
+          <Suspense fallback={<div className="h-16 bg-white border-b border-gray-100" />}>
+            <Navbar />
+          </Suspense>
           <main className="flex-1 py-4 sm:py-6">
             {children}
           </main>
