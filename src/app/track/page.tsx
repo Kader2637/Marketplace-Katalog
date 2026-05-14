@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Truck, Package, CheckCircle2, Clock, MapPin, ArrowLeft, Search, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { Truck, Package, Clock, ArrowLeft, Search, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function TrackPage() {
+function TrackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [orderIdInput, setOrderIdInput] = useState('');
@@ -111,5 +111,13 @@ export default function TrackPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function TrackPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-20 text-center font-black">Memuat Pelacakan...</div>}>
+      <TrackContent />
+    </Suspense>
   );
 }
