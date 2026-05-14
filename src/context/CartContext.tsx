@@ -7,8 +7,8 @@ interface CartContextType {
   // Wadah Keranjang (Navbar)
   cart: CartItem[];
   addToCart: (product: Product, quantity: number) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -16,7 +16,7 @@ interface CartContextType {
   // Wadah Beli Sekarang (Floating Bar)
   buyNowList: CartItem[];
   addToBuyNow: (product: Product, quantity: number) => void;
-  removeFromBuyNow: (productId: number) => void;
+  removeFromBuyNow: (productId: string) => void;
   clearBuyNow: () => void;
   buyNowTotalItems: number;
   buyNowTotalPrice: number;
@@ -58,11 +58,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -87,7 +87,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const removeFromBuyNow = (productId: number) => {
+  const removeFromBuyNow = (productId: string) => {
     setBuyNowList((prev) => prev.filter((item) => item.id !== productId));
   };
 
